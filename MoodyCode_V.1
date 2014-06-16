@@ -1,11 +1,13 @@
 #include <Servo.h> 
 #include <avr/sleep.h>
 
- Servo myservo2;  // create servo objects
+// create servo objects
+
+ Servo myservo2;
  Servo myservo1;  
                  
  int pos = 0;    // variable to store the servo position 
- int boxon =1;
+ int boxon = 1;  // sets boxon = 1
 
  // Predefined positions for each servo
  
@@ -27,7 +29,7 @@
 { 
   myservo2.attach(13);      // attaches the servo on pin 13 to the servo object
   myservo1.attach(12);      // attaches the servo on pin 12 to the servo object
-  // pinMode(8, OUTPUT);    // For the MOSFET (NOT CURRENTLY IN USE
+  pinMode(8, OUTPUT);       // For the MOSFET (NOT CURRENTLY IN USE
   pinMode(2, INPUT);        // For the switch interrupt
   digitalWrite(2, HIGH);    // Sets switch pin HIGH
   myservo2.write(S2fra);    // Moves Servo 2 into S2fra position
@@ -37,7 +39,8 @@
   delay(300);               // Delay
   digitalWrite(8, LOW);     // Turns MOSTFET off
 
-// Put all unused pins to input high to save power.
+// Put all unused pins to input high to save power
+
   pinMode(3, INPUT);
   digitalWrite(3, HIGH);
   pinMode(4, INPUT);
@@ -54,24 +57,33 @@
   digitalWrite(10, HIGH);
   pinMode(11, INPUT);
   digitalWrite(11, HIGH);
-  DDRC = 0;               //Analog input 1/6 (PortC) set to input high also
+  DDRC = 0;               
+  
+//Analog input 1/6 (PortC) set to input high also
+  
   PORTC = 63;
   
-     //External interrupt INT0
+//External interrupt INT0 (I don't really understand this code for Lamja, although I have usedinturrupts before)
+  
   EICRA=0;   //The low level of INT0 generates an interrupt request
   EIMSK=1;   //External Interrupt Request 0 Enable
   
 } 
  
+// Loop section
   
  void loop() 
 { 
-  if(!boxon) //boxon should actually be called boxoff. Did a mistake here.
+  if(!boxon) // boxon should actually be called boxoff. Did a mistake here. (Not sure how to fix or if necessary -IK)
   {
     delay(500);
     digitalWrite(8, HIGH);
 
-    //seq = int(random(0,10)); //If you want random...
+// If next section is commented this out box will run in sequence. If left in it will randomize sequences.
+
+    seq = int(random(0,10)); 
+    
+// Based on which number is slected/next, run the related sequence.
     
     if(seq == 0)Sequense3();
     if(seq == 1)Sequense1();
@@ -92,15 +104,21 @@
     if(seq == 16)Sequense3();
     if(seq == 17)Sequense4();
     seq++;
-    if(seq>17) seq=0;
+    if(seq>17) seq=0;         // Once seq step is greater than 17 it resets to 0
+
+// Next section resets box state I believe and turns off the MOSFET
 
     delay(100);
     digitalWrite(8, LOW);
     boxon=digitalRead(2);
   }
+  
+// If pin 2 remains LOW then the following code is executed  
+  
   else
   {
-    //Set sleep mode, turn off MOSFET and servos
+//Set sleep mode, turn off MOSFET and servos. (From Lamja, I don't really understand this code)
+    
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
     pinMode(12, INPUT);
@@ -122,7 +140,9 @@
 }
 
 
-//Fra=From, Til=To (Sorry for some Norwegian variables)
+// "Fra=From, Til=To (Sorry for some Norwegian variables)" It's ok Lamja I'm working to translate :)
+
+
 void Sweep(int srv, int fra, int til, int usec)  
 {
   if(srv == 1)
@@ -165,7 +185,7 @@ void Sweep(int srv, int fra, int til, int usec)
 ISR(INT0_vect)   // Step rising edge interrupt. Switch flipped.
 {
   EIMSK=0;   //Turn off interrupt
-  boxon=digitalRead(2);  //Read the switch a couple of times to avoid a nasty non working thing some times.
+  boxon=digitalRead(2);  // "Read the switch a couple of times to avoid a nasty non working thing some times." This is line noise I believe
   boxon=digitalRead(2);
   boxon=digitalRead(2);
   boxon=digitalRead(2);
@@ -176,6 +196,10 @@ ISR(INT0_vect)   // Step rising edge interrupt. Switch flipped.
   boxon=digitalRead(2);
   boxon=digitalRead(2);
 }
+
+// Servo sequences that can be called on
+
+// sequence 1
 
 void Sequense1()
 {
@@ -191,6 +215,8 @@ void Sequense1()
   Sweep(2, S2til, S2fra, 500);
   Sweep(1, S1til, S1fra, 500);
 }
+
+// sequence 2
 
 void Sequense2()
 {
@@ -219,6 +245,8 @@ void Sequense2()
   Sweep(1, S1til, S1fra, 500);
 }
 
+// sequence 3
+
 void Sequense3()
 {
   delay(50);
@@ -231,6 +259,8 @@ void Sequense3()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 4
 
 void Sequense4()
 {
@@ -246,6 +276,8 @@ void Sequense4()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 5
 
 void Sequense5()
 {
@@ -272,6 +304,8 @@ void Sequense5()
   delay(400);
 }
 
+// sequence 6
+
 void Sequense6()
 {
   delay(1500);
@@ -288,6 +322,8 @@ void Sequense6()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 7
 
 void Sequense7()
 {
@@ -313,6 +349,8 @@ void Sequense7()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 8
 
 void Sequense8()
 {
@@ -360,6 +398,8 @@ void Sequense8()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 9
 
 void Sequense9()
 {
@@ -411,6 +451,8 @@ void Sequense9()
   Sweep(1, S1til, S1fra, 1);
   delay(400);
 }
+
+// sequence 10
 
 void Sequense10()
 {
